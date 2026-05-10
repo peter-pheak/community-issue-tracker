@@ -49,22 +49,23 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
-# 4. Edit .env with your MySQL credentials
-#    DB_CONNECTION=mysql
-#    DB_HOST=127.0.0.1
-#    DB_PORT=3306
-#    DB_DATABASE=community_issues
-#    DB_USERNAME=root
-#    DB_PASSWORD=
+# 4. The project uses SQLite by default (no MySQL setup needed).
+#    Database file: database/database.sqlite
 
-# 5. Run migrations and seed
-php artisan migrate --seed
+# 5. If PHP SQLite extension is missing, install it:
+#    Ubuntu/Debian: sudo apt install php8.3-sqlite3
+#    macOS:          brew install php (includes SQLite)
+#    Or use the included helper that loads the extension:
+#    Run all artisan commands via: ./artisan.sh <command>
 
-# 6. Create storage symlink (required for image uploads)
-php artisan storage:link
+# 6. Run migrations and seed
+./artisan.sh migrate --seed
 
-# 7. Start the development server
-php artisan serve
+# 7. Create storage symlink (required for image uploads)
+./artisan.sh storage:link
+
+# 8. Start the development server
+./artisan.sh serve
 ```
 
 ## Admin Credentials (demo)
