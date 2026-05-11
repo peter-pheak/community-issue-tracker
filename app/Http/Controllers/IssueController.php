@@ -7,10 +7,7 @@ use Illuminate\Http\Request;
 
 class IssueController extends Controller
 {
-    /**
-     * Public issue list with optional filters + pagination.
-     * Map data is loaded asynchronously via /api/issues/map.
-     */
+    /** Filtered, paginated issue list. Map data via /api/issues/map. */
     public function index(Request $request)
     {
         $query = Issue::query()->latest();
@@ -32,11 +29,7 @@ class IssueController extends Controller
         return view('home', compact('issues'));
     }
 
-    /**
-     * Lightweight JSON endpoint for the Leaflet map.
-     * Returns only id, title, coordinates and status for issues with coordinates.
-     * Capped at 500, ordered by latest.
-     */
+    /** Leaflet map endpoint — id, title, coords, status. Max 500. */
     public function mapData()
     {
         return Issue::select('id', 'title', 'latitude', 'longitude', 'status')
@@ -47,10 +40,7 @@ class IssueController extends Controller
             ->get();
     }
 
-    /**
-     * Public issue detail with eager-loaded comments and status history.
-     * Added by M4 via PR onto this file.
-     */
+    /** Issue detail with comments and status history. */
     public function show(Issue $issue)
     {
         $issue->load(['comments', 'statusHistory']);

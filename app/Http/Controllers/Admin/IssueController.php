@@ -34,7 +34,7 @@ class IssueController extends Controller
             'address'     => ['nullable', 'string', 'max:255'],
         ]);
 
-        // Record status change in history
+        // Log status change
         if ($validated['status'] !== $issue->status) {
             StatusHistory::create([
                 'issue_id'   => $issue->id,
@@ -52,7 +52,7 @@ class IssueController extends Controller
 
     public function destroy(Issue $issue)
     {
-        // Delete stored image before deleting model
+        // Clean up stored image
         if ($issue->image) {
             Storage::disk('public')->delete($issue->image);
         }

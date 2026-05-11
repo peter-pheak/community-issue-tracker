@@ -6,14 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * IMPORTANT: latitude is DECIMAL(10,8) and longitude is DECIMAL(11,8).
-     * Never use FLOAT — it silently loses precision and causes map marker drift.
-     *
-     * After running this migration, run: php artisan storage:link
-     */
+    /** Latitude: DECIMAL(10,8), Longitude: DECIMAL(11,8). Don't use FLOAT. */
     public function up(): void
     {
         Schema::create('issues', function (Blueprint $table) {
@@ -29,7 +22,6 @@ return new class extends Migration
             $table->string('reported_by', 100)->nullable();
             $table->timestamps();
 
-            // Composite index on primary filter columns
             $table->index(['status', 'category']);
             $table->index('category');
             $table->index('status');
