@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StatusHistory extends Model
 {
+    protected $table = 'status_history';
+
     public $timestamps = false;
 
     protected $fillable = ['issue_id', 'status', 'changed_by', 'changed_at'];
