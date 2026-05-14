@@ -127,7 +127,7 @@
 
     .stat-icon.total { background: var(--primary); }
     .stat-icon.open { background: var(--primary); }
-    .stat-icon.progress { background: var(--accent); }
+    .stat-icon.in-progress { background: var(--accent); }
     .stat-icon.resolved { background: var(--success); }
 
     .stat-value {
@@ -180,6 +180,8 @@
 }
 
     .table {
+      border-collapse: separate !important;
+      border-spacing: 0;
       margin-bottom: 0;
       color: var(--primary-dark);
     }
@@ -198,6 +200,7 @@
       border-color: #f0f0f0;
       vertical-align: middle;
       font-size: 0.9rem;
+      overflow: visible !important;
     }
 
     .table tbody tr:hover {
@@ -211,13 +214,14 @@
       font-size: 0.75rem;
       font-weight: 600;
       white-space: nowrap;
-    }
+      line-height: 1.5;
+}
 
     .status-pill.open {
       background: rgba(11,79,108,0.1);
       color: var(--primary);
     }
-    .status-pill.progress {
+    .status-pill.in-progress {
       background: rgba(224,122,95,0.15);
       color: #c4624a;
     }
@@ -318,7 +322,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon progress">
+        <div class="stat-icon in-progress">
           <i class="bi bi-arrow-repeat"></i>
         </div>
         <div>
@@ -374,7 +378,7 @@
               <tr>
                 <td>Street Light Out on Elm</td>
                 <td>Lighting</td>
-                <td><span class="status-pill progress">In Progress</span></td>
+                <td><span class="status-pill in-progress">In Progress</span></td>
                 <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
               </tr>
               <tr>
@@ -392,7 +396,7 @@
               <tr>
                 <td>Faded Crosswalk Lines</td>
                 <td>Road</td>
-                <td><span class="status-pill progress">In Progress</span></td>
+                <td><span class="status-pill in-progress">In Progress</span></td>
                 <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
               </tr>
             </tbody>
