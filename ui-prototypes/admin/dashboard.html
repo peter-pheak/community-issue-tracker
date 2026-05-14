@@ -3,14 +3,453 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Community Issue Tracker</title>
+  <title>Admin Dashboard — CitizenConnect</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/app.css">
+
+  <style>
+    :root {
+      --primary: #0B4F6C;
+      --primary-dark: #04212E;
+      --accent: #E07A5F;
+      --success: #2A9D8F; 
+      --bg-dark: #0A3142;
+      --text-light: #E8E4DF;
+      --white: #ffffff;
+      --border-light: rgba(255,255,255,0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* ===== MINIMAL ADMIN HEADER (same as login) ===== */
+    .admin-header {
+      background-color: var(--primary-dark);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .admin-brand {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+    .admin-brand:hover { color: var(--white); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-link {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .header-link:hover { color: var(--accent); }
+
+    .logout-link {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ===== DASHBOARD CONTENT ===== */
+    .dashboard-content {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* ===== STAT CARDS ===== */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-dark);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .stat-icon.total { background: var(--primary); }
+    .stat-icon.open { background: var(--primary); }
+    .stat-icon.progress { background: var(--accent); }
+    .stat-icon.resolved { background: var(--success); }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--primary);
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    /* ===== CHART + RECENT TABLE ===== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .chart-container {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* Issues table */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: visible;
+}
+
+    .table {
+      margin-bottom: 0;
+      color: var(--primary-dark);
+    }
+
+    .table thead th {
+      background: var(--primary-dark);
+      color: white;
+      font-weight: 500;
+      font-size: 0.85rem;
+      border: none;
+      padding: 0.75rem 1rem;
+    }
+
+    .table tbody td {
+      padding: 0.75rem 1rem;
+      border-color: #f0f0f0;
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-pill.open {
+      background: rgba(11,79,108,0.1);
+      color: var(--primary);
+    }
+    .status-pill.progress {
+      background: rgba(224,122,95,0.15);
+      color: #c4624a;
+    }
+    .status-pill.resolved {
+      background: rgba(42,157,143,0.15);
+      color: #1f7a6f;
+    }
+
+    .action-link {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: color 0.2s;
+    }
+    .action-link:hover { color: var(--accent); }
+
+    /* ===== ADMIN FOOTER ===== */
+    .admin-footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-light);
+      opacity: 0.5;
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border-light);
+      margin-top: 2rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-content {
+        padding: 1.5rem 1rem;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Stat cards + chart + recent issues table -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <a href="home.html" class="admin-brand">
+      <i class="bi bi-building me-1"></i> CitizenConnect
+    </a>
+    <div class="header-actions">
+      <a href="home.html" class="header-link">
+        <i class="bi bi-house-door me-1"></i> View site
+      </a>
+      <a href="login.html" class="header-link logout-link">
+        <i class="bi bi-box-arrow-right me-1"></i> Logout
+      </a>
+    </div>
+  </header>
+
+  <!-- Dashboard Content -->
+  <main class="dashboard-content">
+    <h1 class="page-title">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </h1>
+
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon total">
+          <i class="bi bi-inbox-fill"></i>
+        </div>
+        <div>
+          <div class="stat-value">1,284</div>
+          <div class="stat-label">Total Issues</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon open">
+          <i class="bi bi-circle-fill"></i>
+        </div>
+        <div>
+          <div class="stat-value">337</div>
+          <div class="stat-label">Open</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon progress">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+        <div>
+          <div class="stat-value">128</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon resolved">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div>
+          <div class="stat-value">819</div>
+          <div class="stat-label">Resolved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart + Recent Issues -->
+    <div class="dashboard-grid">
+      <!-- Chart Card -->
+      <div class="card">
+        <h2 class="card-title">
+          <i class="bi bi-pie-chart-fill"></i> Issues by Category
+        </h2>
+        <div class="chart-container">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Issues Table -->
+      <div class="card">
+        <h2 class="card-title">
+          <i class="bi bi-clock-history"></i> Recent Issues
+        </h2>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pothole on Main Street</td>
+                <td>Road</td>
+                <td><span class="status-pill open">Open</span></td>
+                <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
+              </tr>
+              <tr>
+                <td>Street Light Out on Elm</td>
+                <td>Lighting</td>
+                <td><span class="status-pill progress">In Progress</span></td>
+                <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
+              </tr>
+              <tr>
+                <td>Illegal Dumping at Park</td>
+                <td>Waste</td>
+                <td><span class="status-pill resolved">Resolved</span></td>
+                <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
+              </tr>
+              <tr>
+                <td>Broken Bench in Central Park</td>
+                <td>Other</td>
+                <td><span class="status-pill open">Open</span></td>
+                <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
+              </tr>
+              <tr>
+                <td>Faded Crosswalk Lines</td>
+                <td>Road</td>
+                <td><span class="status-pill progress">In Progress</span></td>
+                <td><a href="issues-list.html" class="action-link">Edit <i class="bi bi-chevron-right"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-end mt-3">
+          <a href="issues-list.html" class="action-link">
+            View all issues <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Admin Footer -->
+  <footer class="admin-footer">
+    &copy; 2026 CitizenConnect — Admin Panel
+  </footer>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    (function() {
+      // Doughnut chart for issue categories
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Road', 'Lighting', 'Waste', 'Other'],
+          datasets: [{
+            data: [450, 320, 280, 234],
+            backgroundColor: [
+              '#0B4F6C',
+              '#E07A5F',
+              '#2A9D8F',
+              '#D6CCC2'
+            ],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                pointStyleWidth: 10,
+                padding: 20,
+                font: { size: 12 }
+              }
+            }
+          }
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

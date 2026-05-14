@@ -3,14 +3,500 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Issue Detail — Community Issue Tracker</title>
+  <title>Issue Detail — CitizenConnect</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/app.css">
+
+  <style>
+    :root {
+      --primary: #0B4F6C;
+      --accent: #E07A5F;
+      --success: #2A9D8F;
+      --bg: #F4F1EA;
+      --text: #1E293B;
+      --border: #D6CCC2;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0; padding: 0; overflow-x: hidden;
+    }
+
+    /* ===== LAYERS (same as home/report) ===== */
+    .layer-background {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .atmospheric-glow {
+      position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 120%; height: 80%;
+      background: radial-gradient(ellipse at center, rgba(11,79,108,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .layer-midground {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 300px;
+      z-index: 1; pointer-events: none; overflow: hidden;
+    }
+    .skyline { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
+    .skyline-1 { fill: rgba(11,79,108,0.08); }
+    .skyline-2 { fill: rgba(224,122,95,0.06); }
+    .skyline-3 { fill: rgba(180,160,140,0.10); }
+    .layer-foreground { position: relative; z-index: 2; }
+
+    /* ===== NAVBAR (identical to home) ===== */
+    .site-header {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .site-header:not(.scrolled) {
+      background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .site-header.scrolled {
+      background-color: var(--white); box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .navbar-brand-custom {
+      font-weight: 600; font-size: 1.25rem; color: var(--primary) !important;
+      display: flex; align-items: center; gap: 0.5rem; text-decoration: none;
+    }
+    .navbar-brand-custom:hover { color: var(--primary) !important; }
+    .nav-link-custom {
+      color: var(--text) !important; position: relative; padding: 0.5rem 1rem;
+      transition: color 0.3s ease;
+    }
+    .nav-link-custom::after {
+      content: ''; display: block; width: 0; height: 2px; background: var(--accent);
+      transition: width 0.3s ease, transform 0.3s ease;
+      position: absolute; bottom: 0; left: 0; transform: scaleX(0); transform-origin: left;
+    }
+    .nav-link-custom.active::after,
+    .nav-link-custom:hover::after { width: 100%; transform: scaleX(1); }
+    .nav-link-custom:hover { color: var(--text) !important; }
+    .btn-primary-pill {
+      background-color: var(--primary); color: var(--white); border: none; border-radius: 2rem;
+      padding: 0.5rem 1.25rem; font-weight: 500; display: inline-flex; align-items: center;
+      gap: 0.5rem; text-decoration: none; transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 6px rgba(11,79,108,0.2);
+    }
+    .btn-primary-pill:hover { background-color: #093d55; color: var(--white); box-shadow: 0 4px 12px rgba(11,79,108,0.3); }
+    .navbar-toggler-custom { border: 1px solid var(--border); padding: 0.5rem; }
+    .navbar-toggler-custom:focus { box-shadow: none; }
+    .navbar-collapse-custom {
+      background-color: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); border-radius: 0 0 1rem 1rem;
+      padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 0.5rem;
+    }
+    .nav-item-custom { padding: 0.5rem 0; }
+
+    /* ===== PAGE CONTENT ===== */
+    .detail-page {
+      padding: 7rem 1rem 4rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Issue header card */
+    .issue-detail-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .detail-category {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.85rem; padding: 0.35rem 0.85rem; border-radius: 20px;
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .detail-status {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 20px;
+      font-weight: 600;
+    }
+    .status-open { background: rgba(11,79,108,0.1); color: var(--primary); }
+    .status-progress { background: rgba(224,122,95,0.15); color: #c4624a; }
+    .status-resolved { background: rgba(42,157,143,0.15); color: #1f7a6f; }
+
+    .detail-address {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.9rem; color: var(--text); opacity: 0.75; margin-top: 0.5rem;
+    }
+
+    .detail-description {
+      font-size: 1rem; line-height: 1.7; color: var(--text); opacity: 0.9;
+      margin: 1.5rem 0 0;
+    }
+
+    /* Mini map */
+    .mini-map-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .mini-map-placeholder {
+      background: #f0ece7; border: 1px solid var(--border); border-radius: 12px;
+      height: 220px; display: flex; align-items: center; justify-content: center;
+      color: var(--text); opacity: 0.6; flex-direction: column; gap: 0.5rem;
+    }
+
+    /* Status timeline */
+    .timeline-section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .timeline {
+      list-style: none; padding: 0; margin: 0;
+    }
+
+    .timeline-item {
+      position: relative; padding-left: 2.5rem; padding-bottom: 2rem;
+      border-left: 2px solid var(--border);
+    }
+    .timeline-item:last-child {
+      border-left-color: transparent; padding-bottom: 0;
+    }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -8px; top: 4px;
+      width: 14px; height: 14px; border-radius: 50%; background: var(--primary);
+      border: 2px solid var(--white); box-shadow: 0 0 0 2px var(--border);
+    }
+    .timeline-item.completed::before { background: var(--success); }
+    .timeline-item.active::before { background: var(--accent); }
+
+    .timeline-status {
+      font-weight: 600; font-size: 0.95rem; color: var(--primary);
+    }
+    .timeline-date {
+      font-size: 0.8rem; color: var(--text); opacity: 0.6; margin-left: 0.75rem;
+    }
+    .timeline-by {
+      font-size: 0.85rem; color: var(--text); opacity: 0.7;
+    }
+
+    /* Comments */
+    .comments-section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .comment-card {
+      background: var(--bg); border-radius: 12px; padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .comment-author {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+    }
+    .author-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--primary);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 0.85rem;
+    }
+    .comment-text { font-size: 0.95rem; color: var(--text); opacity: 0.85; margin: 0; }
+
+    /* Comment form */
+    .comment-form-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .btn-comment-submit {
+      background: var(--primary); color: white; border: none; border-radius: 50px;
+      padding: 0.6rem 1.8rem; font-weight: 500; display: inline-flex; align-items: center;
+      gap: 0.5rem; transition: background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 8px rgba(11,79,108,0.2);
+    }
+    .btn-comment-submit:hover { background: #093d55; }
+
+    .error-text {
+      display: none; color: #c0392b; font-size: 0.8rem; margin-top: 0.25rem;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .shake { animation: shake 0.3s ease-in-out; }
+
+    /* ===== FOOTER (identical) ===== */
+    .site-footer {
+      background-color: var(--primary); color: var(--white); position: relative;
+      overflow: hidden; padding-top: 3rem;
+    }
+    .footer-skyline { position: absolute; top: 0; left: 0; width: 100%; height: 30px; pointer-events: none; }
+    .footer-skyline svg { width: 100%; height: 100%; }
+    .footer-brand-text { color: rgba(255,255,255,0.5); font-size: 0.875rem; line-height: 1.6; }
+    .footer-heading { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 1rem; font-weight: 600; }
+    .footer-links { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 0.5rem; }
+    .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s ease; }
+    .footer-link:hover { color: var(--accent); }
+    .footer-contact-item { color: rgba(255,255,255,0.5); font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s ease; }
+    .footer-contact-item:hover { color: var(--accent); }
+    .back-to-top { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease; cursor: pointer; }
+    .back-to-top:hover { background-color: var(--accent); border-color: var(--accent); transform: translateY(-3px); }
+    .footer-divider { border-color: rgba(255,255,255,0.2); margin: 2rem 0; }
+    .footer-bottom-text { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .layer-midground { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Status timeline + mini-map + comments -->
+  <!-- Layers -->
+  <div class="layer-background"><div class="atmospheric-glow"></div></div>
+  <div class="layer-midground">
+    <svg class="skyline skyline-1" preserveAspectRatio="none" viewBox="0 0 1440 300">
+      <path d="M0,300 L0,200 L40,200 L40,180 L60,180 L60,220 L100,220 L100,150 L130,150 L130,230 L160,230 L160,120 L200,120 L200,240 L240,240 L240,160 L280,160 L280,200 L320,200 L320,140 L360,140 L360,250 L400,250 L400,180 L440,180 L440,160 L480,160 L480,220 L520,220 L520,100 L560,100 L560,230 L600,230 L600,170 L640,170 L640,190 L680,190 L680,130 L720,130 L720,240 L760,240 L760,180 L800,180 L800,210 L840,210 L840,150 L880,150 L880,200 L920,200 L920,170 L960,170 L960,220 L1000,220 L1000,140 L1040,140 L1040,230 L1080,230 L1080,180 L1120,180 L1120,190 L1160,190 L1160,160 L1200,160 L1200,240 L1240,240 L1240,170 L1280,170 L1280,200 L1320,200 L1320,180 L1360,180 L1360,210 L1400,210 L1400,190 L1440,190 L1440,300 Z"/>
+    </svg>
+    <svg class="skyline skyline-2" preserveAspectRatio="none" viewBox="0 0 1440 300">
+      <path d="M0,300 L0,220 L50,220 L50,180 L80,180 L80,200 L120,200 L120,140 L160,140 L160,210 L200,210 L200,160 L240,160 L240,230 L280,230 L280,150 L320,150 L320,190 L360,190 L360,170 L400,170 L400,240 L440,240 L440,180 L480,180 L480,130 L520,130 L520,220 L560,220 L560,160 L600,160 L600,200 L640,200 L640,140 L680,140 L680,230 L720,230 L720,180 L760,180 L760,210 L800,210 L800,150 L840,150 L840,190 L880,190 L880,170 L920,170 L920,230 L960,230 L960,160 L1000,160 L1000,200 L1040,200 L1040,180 L1080,180 L1080,210 L1120,210 L1120,170 L1160,170 L1160,220 L1200,220 L1200,160 L1240,160 L1240,190 L1280,190 L1280,170 L1320,170 L1320,200 L1360,200 L1360,180 L1400,180 L1400,210 L1440,210 L1440,300 Z"/>
+    </svg>
+    <svg class="skyline skyline-3" preserveAspectRatio="none" viewBox="0 0 1440 300">
+      <path d="M0,300 L0,240 L30,240 L30,200 L70,200 L70,170 L110,170 L110,220 L150,220 L150,160 L190,160 L190,210 L230,210 L230,180 L270,180 L270,250 L310,250 L310,190 L350,190 L350,220 L390,220 L390,170 L430,170 L430,230 L470,230 L470,180 L510,180 L510,240 L550,240 L550,160 L590,160 L590,200 L630,200 L630,180 L670,180 L670,230 L710,230 L710,190 L750,190 L750,210 L790,210 L790,170 L830,170 L830,240 L870,240 L870,190 L910,190 L910,220 L950,220 L950,180 L990,180 L990,250 L1030,250 L1030,200 L1070,200 L1070,170 L1110,170 L1110,230 L1150,230 L1150,180 L1190,180 L1190,210 L1230,210 L1230,190 L1270,190 L1270,220 L1310,220 L1310,180 L1350,180 L1350,240 L1390,240 L1390,200 L1440,200 L1440,300 Z"/>
+    </svg>
+  </div>
+
+  <div class="layer-foreground">
+    <!-- NAVBAR -->
+    <header class="site-header" id="siteHeader">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand-custom" href="home.html">
+            <i class="bi bi-building me-2"></i>CitizenConnect
+          </a>
+          <button class="navbar-toggler navbar-toggler-custom" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+              <li class="nav-item">
+                <a class="nav-link-custom" href="home.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link-custom" href="#">Map</a>
+              </li>
+              <li class="nav-item ms-2">
+                <a class="btn-primary-pill" href="report.html"><i class="bi bi-plus-circle"></i> Report an Issue</a>
+              </li>
+              <li class="nav-item ms-2">
+                <a class="nav-link-custom" href="admin/login.html"><i class="bi bi-person-circle"></i> Admin</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="detail-page">
+      <!-- Issue Detail Card -->
+      <div class="issue-detail-card">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <span class="detail-category">
+            <i class="bi bi-cone-striped"></i> Road
+          </span>
+          <span class="detail-status status-open">
+            <i class="bi bi-circle"></i> Open
+          </span>
+        </div>
+        <h1 class="h3 fw-bold" style="color: var(--text);">Pothole on Main Street</h1>
+        <div class="detail-address">
+          <i class="bi bi-geo-alt-fill"></i> Main St & Oak Ave
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-3 mt-2" style="font-size: 0.85rem; color: var(--text); opacity: 0.7;">
+          <span><i class="bi bi-person-fill me-1"></i> Reported by Jane D.</span>
+          <span><i class="bi bi-calendar3 me-1"></i> May 10, 2026</span>
+        </div>
+        <p class="detail-description">
+          Large pothole near the intersection of Main St and Oak Ave. Several cars have already damaged their tires. It's been here for over a week and is getting worse after the rain. Please fix as soon as possible.
+        </p>
+      </div>
+
+      <!-- Mini Map -->
+      <div class="mini-map-card">
+        <div class="d-flex align-items-center gap-2 mb-2 fw-semibold"><i class="bi bi-map-fill"></i> Location</div>
+        <div class="mini-map-placeholder">
+          <i class="bi bi-pin-map-fill" style="font-size: 2rem;"></i>
+          <span>Map loading...</span>
+        </div>
+      </div>
+
+      <!-- Status History Timeline -->
+      <div class="timeline-section">
+        <h2 class="h5 fw-bold mb-4"><i class="bi bi-clock-history me-2"></i>Status History</h2>
+        <ul class="timeline">
+          <li class="timeline-item">
+            <div class="timeline-status">Open</div>
+            <div class="d-flex align-items-center">
+              <span class="timeline-date">May 10, 2026</span>
+              <span class="timeline-by ms-2">by citizen Jane D.</span>
+            </div>
+          </li>
+          <li class="timeline-item active">
+            <div class="timeline-status">In Progress</div>
+            <div class="d-flex align-items-center">
+              <span class="timeline-date">May 11, 2026</span>
+              <span class="timeline-by ms-2">by Admin</span>
+            </div>
+          </li>
+          <!-- The next status is not yet reached, but we can show a future placeholder if needed -->
+        </ul>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section">
+        <h2 class="h5 fw-bold mb-4"><i class="bi bi-chat-dots-fill me-2"></i>Comments (2)</h2>
+        <div class="comment-card">
+          <div class="comment-author">
+            <div class="author-avatar">JD</div>
+            <div>
+              <strong>Jane D.</strong>
+              <span class="text-muted ms-2" style="font-size:0.8rem;">May 10, 2026</span>
+            </div>
+          </div>
+          <p class="comment-text">I saw a car get a flat tire here yesterday. This really needs to be fixed urgently.</p>
+        </div>
+        <div class="comment-card">
+          <div class="comment-author">
+            <div class="author-avatar">MK</div>
+            <div>
+              <strong>Mike K.</strong>
+              <span class="text-muted ms-2" style="font-size:0.8rem;">May 10, 2026</span>
+            </div>
+          </div>
+          <p class="comment-text">Thanks for reporting! I've forwarded this to the road maintenance team.</p>
+        </div>
+
+        <!-- Add Comment Form -->
+        <div class="comment-form-card">
+          <h3 class="h6 fw-bold mb-3"><i class="bi bi-pencil-square me-2"></i>Leave a comment</h3>
+          <form id="commentForm" novalidate>
+            <div class="mb-3">
+              <label for="commentAuthor" class="form-label fw-semibold">Your name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="commentAuthor" placeholder="Enter your name" required minlength="2">
+              <div class="error-text" id="authorError">Please enter your name (at least 2 characters).</div>
+            </div>
+            <div class="mb-3">
+              <label for="commentText" class="form-label fw-semibold">Comment <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="commentText" rows="3" placeholder="Write your comment..." required minlength="10"></textarea>
+              <div class="error-text" id="commentTextError">Comment must be at least 10 characters.</div>
+            </div>
+            <button type="submit" class="btn-comment-submit">
+              <i class="bi bi-send-fill"></i> Post Comment
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-skyline" aria-hidden="true">
+        <svg preserveAspectRatio="none" viewBox="0 0 1440 30">
+          <path d="M0,30 L0,20 L30,20 L30,15 L60,15 L60,22 L90,22 L90,10 L120,10 L120,18 L150,18 L150,12 L180,12 L180,24 L210,24 L210,16 L240,16 L240,20 L270,20 L270,14 L300,14 L300,22 L330,22 L330,18 L360,18 L360,25 L390,25 L390,15 L420,15 L420,20 L450,20 L450,16 L480,16 L480,24 L510,24 L510,12 L540,12 L540,22 L570,22 L570,18 L600,18 L600,14 L630,14 L630,23 L660,23 L660,19 L690,19 L690,21 L720,21 L720,11 L750,11 L750,20 L780,20 L780,17 L810,17 L810,22 L840,22 L840,16 L870,16 L870,24 L900,24 L900,13 L930,13 L930,21 L960,21 L960,18 L990,18 L990,25 L1020,25 L1020,14 L1050,14 L1050,22 L1080,22 L1080,19 L1110,19 L1110,15 L1140,15 L1140,23 L1170,23 L1170,17 L1200,17 L1200,24 L1230,24 L1230,16 L1260,16 L1260,20 L1290,20 L1290,18 L1320,18 L1320,21 L1350,21 L1350,14 L1380,14 L1380,22 L1410,22 L1410,19 L1440,19 L1440,30 Z" fill="rgba(255,255,255,0.15)"/>
+        </svg>
+      </div>
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <a class="navbar-brand-custom mb-3 d-inline-block" href="#"><i class="bi bi-building me-2"></i>CitizenConnect</a>
+            <p class="footer-brand-text">A community-powered platform for reporting and tracking local issues. Together we build a better neighbourhood.</p>
+          </div>
+          <div class="col-md-2">
+            <h6 class="footer-heading">Explore</h6>
+            <ul class="footer-links">
+              <li><a href="home.html" class="footer-link">Home</a></li>
+              <li><a href="#" class="footer-link">Map</a></li>
+              <li><a href="report.html" class="footer-link">Report Issue</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6 class="footer-heading">Contact</h6>
+            <a href="mailto:hello@citizenconnect.local" class="footer-contact-item"><i class="bi bi-envelope"></i> hello@citizenconnect.local</a>
+            <a href="#" class="footer-contact-item"><i class="bi bi-github"></i> GitHub</a>
+          </div>
+          <div class="col-md-3 text-md-end">
+            <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+          </div>
+        </div>
+        <hr class="footer-divider">
+        <p class="footer-bottom-text text-center">&copy; 2026 CitizenConnect — Made with care for the community</p>
+      </div>
+    </footer>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    (function() {
+      // Navbar scroll effect
+      const header = document.getElementById('siteHeader');
+      window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 20));
+
+      // Back to top
+      document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // Comment form validation
+      const commentForm = document.getElementById('commentForm');
+      commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let valid = true;
+
+        const author = document.getElementById('commentAuthor');
+        const text = document.getElementById('commentText');
+        const authorError = document.getElementById('authorError');
+        const textError = document.getElementById('commentTextError');
+
+        if (author.value.trim().length < 2) {
+          author.classList.add('shake');
+          authorError.style.display = 'block';
+          valid = false;
+        } else {
+          authorError.style.display = 'none';
+        }
+        author.addEventListener('animationend', () => author.classList.remove('shake'), { once: true });
+
+        if (text.value.trim().length < 10) {
+          text.classList.add('shake');
+          textError.style.display = 'block';
+          valid = false;
+        } else {
+          textError.style.display = 'none';
+        }
+        text.addEventListener('animationend', () => text.classList.remove('shake'), { once: true });
+
+        if (valid) {
+          alert('Comment posted! (Prototype)');
+          commentForm.reset();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
