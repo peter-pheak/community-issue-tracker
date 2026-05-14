@@ -239,6 +239,7 @@
       color: var(--text);
       margin-bottom: 1rem;
       line-height: 1.2;
+      letter-spacing: -0.5px;
     }
 
     .hero-subtitle {
@@ -283,6 +284,211 @@
       padding: 2rem 1rem;
       max-width: 1200px;
       margin: 0 auto;
+    }
+
+    /* ===== FILTER TRAY ===== */
+    .filter-tray {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      padding: 1rem 1.5rem;
+      margin: 1rem auto 2rem;
+      max-width: 1200px;
+      position: relative;
+    }
+
+    .filter-tray::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(244, 241, 234, 0.8), transparent);
+    }
+
+    .filter-search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .filter-search-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--text);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .filter-search {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.9rem;
+      background: var(--white);
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-search:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.15);
+    }
+
+    .filter-search::placeholder {
+      color: var(--text);
+      opacity: 0.6;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip:hover {
+      background: rgba(11, 79, 108, 0.05);
+    }
+
+    .filter-chip.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(11, 79, 108, 0.2);
+    }
+
+    .status-segmented {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg);
+      border-radius: 50px;
+      padding: 0.25rem;
+      width: fit-content;
+    }
+
+    .status-segmented input[type="radio"] {
+      display: none;
+    }
+
+    .status-segmented label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .status-segmented label:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-segmented input[type="radio"]:checked + label {
+      color: var(--white);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-segmented input[value="Open"]:checked + label {
+      background: var(--primary);
+    }
+
+    .status-segmented input[value="In Progress"]:checked + label {
+      background: var(--accent);
+    }
+
+    .status-segmented input[value="Resolved"]:checked + label {
+      background: var(--success);
+    }
+
+    .filter-all-btn {
+      display: none;
+      padding: 0.5rem 0.75rem;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      opacity: 0.6;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .filter-all-btn:hover {
+      opacity: 1;
+    }
+
+    .filter-all-btn.visible {
+      display: inline-block;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .filter-tray {
+        padding: 1rem;
+        margin: 1rem 0.5rem 2rem;
+      }
+
+      .filter-chips {
+        flex-nowrap: overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.5rem;
+        scrollbar-width: none;
+      }
+
+      .filter-chips::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter-chip {
+        flex-shrink: 0;
+        min-height: 44px;
+      }
+
+      .status-segmented label {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+      }
+
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-segmented {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     .map-container {
@@ -650,7 +856,7 @@
       }
     }
 
-    /* ===== REDUCED MOTION ===== */
+    /* ===== REDUCED MOTION (improved) ===== */
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -667,6 +873,13 @@
 
       .layer-midground {
         display: none;
+      }
+
+      /* Stop the shimmer completely */
+      .map-skeleton {
+        animation: none;
+        background: linear-gradient(90deg, #e8e4df 25%, #f0ece7 50%, #e8e4df 75%);
+        background-size: 200% 100%;
       }
     }
   </style>
@@ -759,13 +972,46 @@
       </div>
     </section>
 
+    <!-- ===== FILTER TRAY ===== -->
+    <div class="filter-tray" role="search" aria-label="Filter issues">
+      <div class="filter-row">
+        <div class="filter-search-wrapper" style="flex: 1; min-width: 200px;">
+          <i class="bi bi-search filter-search-icon" aria-hidden="true"></i>
+          <input type="text" class="filter-search" id="filterSearch" placeholder="What's happening near you?" aria-label="Search issues by title or description">
+        </div>
+        <div class="filter-chips" role="group" aria-label="Category filters">
+          <button class="filter-chip" data-category="Road" aria-pressed="false">
+            <i class="bi bi-cone-striped"></i> Road
+          </button>
+          <button class="filter-chip" data-category="Lighting" aria-pressed="false">
+            <i class="bi bi-lightbulb"></i> Lighting
+          </button>
+          <button class="filter-chip" data-category="Waste" aria-pressed="false">
+            <i class="bi bi-trash"></i> Waste
+          </button>
+          <button class="filter-chip" data-category="Other" aria-pressed="false">
+            <i class="bi bi-three-dots"></i> Other
+          </button>
+        </div>
+        <div class="status-segmented" role="radiogroup" aria-label="Status filter">
+          <input type="radio" name="statusFilter" id="statusOpen" value="Open">
+          <label for="statusOpen"><i class="bi bi-circle"></i> Open</label>
+          <input type="radio" name="statusFilter" id="statusProgress" value="In Progress">
+          <label for="statusProgress"><i class="bi bi-arrow-repeat"></i> In Progress</label>
+          <input type="radio" name="statusFilter" id="statusResolved" value="Resolved">
+          <label for="statusResolved"><i class="bi bi-check-circle-fill"></i> Resolved</label>
+          <button class="filter-all-btn" id="filterAllBtn" aria-label="Clear status filter">All</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== ISSUE CARDS GRID ===== -->
     <section class="issues-section">
       <h2 class="section-title">Recent Issues</h2>
       <div class="row g-4">
         <!-- Issue Card 1 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Road" data-status="Open">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-cone-striped"></i> Road
@@ -787,7 +1033,7 @@
 
         <!-- Issue Card 2 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Lighting" data-status="In Progress">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-lightbulb"></i> Lighting
@@ -809,7 +1055,7 @@
 
         <!-- Issue Card 3 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Waste" data-status="Resolved">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-trash"></i> Waste
@@ -831,7 +1077,7 @@
 
         <!-- Issue Card 4 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Other" data-status="Open">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-three-dots"></i> Other
@@ -853,7 +1099,7 @@
 
         <!-- Issue Card 5 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Road" data-status="In Progress">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-cone-striped"></i> Road
@@ -875,7 +1121,7 @@
 
         <!-- Issue Card 6 -->
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="issue-card reveal">
+          <article class="issue-card" data-category="Lighting" data-status="Resolved">
             <div class="issue-header">
               <span class="category-badge">
                 <i class="bi bi-lightbulb"></i> Lighting
@@ -947,86 +1193,64 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ===== CHECK FOR REDUCED MOTION ===== */
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.innerWidth < 768;
+    (function() {
+      /* ===== CHECK FOR REDUCED MOTION ===== */
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isMobile = window.innerWidth < 768;
 
-    /* ===== NAVBAR SCROLL BEHAVIOR ===== */
-    const siteHeader = document.getElementById('siteHeader');
-    if (siteHeader) {
-      window.addEventListener('scroll', function() {
-        if (window.scrollY > 20) {
-          siteHeader.classList.add('scrolled');
-        } else {
-          siteHeader.classList.remove('scrolled');
-        }
-      });
-    }
-
-    /* ===== BACK TO TOP BUTTON ===== */
-    const backToTopBtn = document.getElementById('backToTop');
-    if (backToTopBtn) {
-      backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
+      /* ===== NAVBAR SCROLL BEHAVIOR ===== */
+      const siteHeader = document.getElementById('siteHeader');
+      if (siteHeader) {
+        window.addEventListener('scroll', function() {
+          siteHeader.classList.toggle('scrolled', window.scrollY > 20);
         });
-      });
-    }
+      }
 
-    /* ===== PARALLAX SKYLINE ===== */
-    if (!prefersReducedMotion && !isMobile) {
-      const skyline1 = document.querySelector('.skyline-1');
-      const skyline2 = document.querySelector('.skyline-2');
-      const skyline3 = document.querySelector('.skyline-3');
+      /* ===== BACK TO TOP BUTTON ===== */
+      const backToTopBtn = document.getElementById('backToTop');
+      if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
 
-      let ticking = false;
+      /* ===== PARALLAX SKYLINE ===== */
+      if (!prefersReducedMotion && !isMobile) {
+        const skyline1 = document.querySelector('.skyline-1');
+        const skyline2 = document.querySelector('.skyline-2');
+        const skyline3 = document.querySelector('.skyline-3');
 
-      window.addEventListener('scroll', function() {
-        if (!ticking) {
-          window.requestAnimationFrame(function() {
-            const scrollY = window.scrollY;
-
-            if (skyline1) {
-              skyline1.style.transform = 'translateY(' + (scrollY * 0.02) + 'px)';
-            }
-            if (skyline2) {
-              skyline2.style.transform = 'translateY(' + (scrollY * 0.04) + 'px)';
-            }
-            if (skyline3) {
-              skyline3.style.transform = 'translateY(' + (scrollY * 0.06) + 'px)';
-            }
-
-            ticking = false;
-          });
-
-          ticking = true;
-        }
-      });
-    }
-
-    /* ===== SCROLL REVEAL ===== */
-    document.addEventListener('DOMContentLoaded', function() {
-      const revealElements = document.querySelectorAll('.reveal');
-
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObserver.unobserve(entry.target);
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+          if (!ticking) {
+            window.requestAnimationFrame(function() {
+              const scrollY = window.scrollY;
+              if (skyline1) skyline1.style.transform = `translateY(${scrollY * 0.02}px)`;
+              if (skyline2) skyline2.style.transform = `translateY(${scrollY * 0.04}px)`;
+              if (skyline3) skyline3.style.transform = `translateY(${scrollY * 0.06}px)`;
+              ticking = false;
+            });
+            ticking = true;
           }
         });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      });
+      }
 
-      revealElements.forEach(el => revealObserver.observe(el));
-    });
+      /* ===== SCROLL REVEAL ===== */
+      const revealElements = document.querySelectorAll('.reveal');
+      if (revealElements.length > 0) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        revealElements.forEach(el => revealObserver.observe(el));
+      }
 
-    /* ===== COUNTER ANIMATION ===== */
-    if (!prefersReducedMotion) {
-      document.addEventListener('DOMContentLoaded', function() {
+      /* ===== COUNTER ANIMATION ===== */
+      if (!prefersReducedMotion) {
         const counters = document.querySelectorAll('.counter-number');
         let countersStarted = false;
 
@@ -1036,7 +1260,6 @@
             const duration = 2000;
             const increment = target / (duration / 16);
             let current = 0;
-
             const updateCounter = () => {
               current += increment;
               if (current < target) {
@@ -1046,27 +1269,88 @@
                 counter.textContent = target.toLocaleString();
               }
             };
-
             updateCounter();
           });
         }
 
-        const counterObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !countersStarted) {
-              countersStarted = true;
-              startCounters();
-              counterObserver.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.5 });
-
-        const heroCard = document.querySelector('.hero-card');
-        if (heroCard) {
-          counterObserver.observe(heroCard);
+        if (counters.length > 0) {
+          const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && !countersStarted) {
+                countersStarted = true;
+                startCounters();
+                counterObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.5 });
+          // observe the hero card which contains the counters
+          const heroCard = document.querySelector('.hero-card');
+          if (heroCard) counterObserver.observe(heroCard);
         }
+      }
+
+      /* ===== FILTER TRAY FUNCTIONALITY ===== */
+      const filterSearch = document.getElementById('filterSearch');
+      const filterChips = document.querySelectorAll('.filter-chip');
+      const statusRadios = document.querySelectorAll('input[name="statusFilter"]');
+      const filterAllBtn = document.getElementById('filterAllBtn');
+      const issueCards = document.querySelectorAll('.issue-card');
+
+      const activeCategories = new Set();
+      let activeStatus = null;
+
+      function filterCards() {
+        const searchTerm = filterSearch.value.toLowerCase().trim();
+
+        issueCards.forEach(card => {
+          const category = card.getAttribute('data-category');
+          const status = card.getAttribute('data-status');
+          const title = card.querySelector('.issue-title')?.textContent.toLowerCase() ?? '';
+          const description = card.querySelector('.issue-description')?.textContent.toLowerCase() ?? '';
+
+          const matchesSearch = searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm);
+          const matchesCategory = activeCategories.size === 0 || activeCategories.has(category);
+          const matchesStatus = activeStatus === null || status === activeStatus;
+
+          card.style.display = (matchesSearch && matchesCategory && matchesStatus) ? '' : 'none';
+        });
+
+        filterAllBtn.classList.toggle('visible', activeStatus !== null);
+      }
+
+      // Category chips
+      filterChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+          const category = this.getAttribute('data-category');
+          const isActive = this.classList.toggle('active');
+          if (isActive) {
+            activeCategories.add(category);
+          } else {
+            activeCategories.delete(category);
+          }
+          this.setAttribute('aria-pressed', isActive.toString());
+          filterCards();
+        });
       });
-    }
+
+      // Status radios
+      statusRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+          activeStatus = this.checked ? this.value : null;
+          filterCards();
+        });
+      });
+
+      // All button
+      filterAllBtn.addEventListener('click', function() {
+        statusRadios.forEach(radio => radio.checked = false);
+        activeStatus = null;
+        filterCards();
+      });
+
+      // Search input
+      filterSearch.addEventListener('input', filterCards);
+    })();
   </script>
 </body>
 </html>
