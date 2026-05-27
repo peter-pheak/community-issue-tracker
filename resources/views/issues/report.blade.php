@@ -14,7 +14,7 @@
 
     {{-- Form --}}
     <form action="{{ route('report.store') }}" method="POST" enctype="multipart/form-data" id="reportForm"
-          class="rounded-4 p-4 reveal" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border: 1px solid var(--border);">
+          class="rounded-4 p-4 reveal visible" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border: 1px solid var(--border);">
       @csrf
 
       {{-- Title --}}
