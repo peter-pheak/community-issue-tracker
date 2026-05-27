@@ -25,8 +25,9 @@ class IssueController extends Controller
         }
 
         $issues = $query->paginate(12)->withQueryString();
+        $stats = ["total" => Issue::count(), "open" => Issue::where("status", "Open")->count(), "in_progress" => Issue::where("status", "In Progress")->count(), "resolved" => Issue::where("status", "Resolved")->count()];
 
-        return view('home', compact('issues'));
+        return view('home', compact("issues", "stats"));
     }
 
     /** Leaflet map endpoint — id, title, coords, status. Max 500. */
