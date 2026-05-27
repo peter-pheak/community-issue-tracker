@@ -1,141 +1,203 @@
 # Community Issue Tracker
 
-A dynamic web application where citizens can report local problems (potholes, broken streetlights, waste disposal issues) and view them on an interactive map. Administrators manage all issues through a secure back office.
+A dynamic web application where citizens can report local problems — potholes, broken streetlights, waste disposal issues — and view them on an interactive map. Administrators manage all issues through a secure back office.
 
-## Team
+**Live demo:** `http://localhost:8000`  
+**GitHub:** https://github.com/peter-pheak/community-issue-tracker  
+**Branch:** `UI-prototypes`
 
-| Member | Name | Role |
-|--------|------|------|
-| M1 | ... | Project Lead & Auth |
-| M2 | ... | Report Issue (Front Office) |
-| M3 | ... | Public Map & Issue List |
-| M4 | ... | Issue Detail & Comments |
-| M5 | ... | Admin Dashboard & Issue Management |
-| M6 | ... | UI/UX, Master Layout & Testing |
+---
 
 ## Tech Stack
 
-- **Backend:** Laravel 11 (PHP 8.2+)
-- **Database:** MySQL
-- **ORM:** Eloquent
-- **Templating:** Blade
-- **Frontend:** Bootstrap 5 (CDN)
-- **Map:** Leaflet.js (CDN)
-- **Icons:** Bootstrap Icons
-- **Version Control:** Git / GitHub (feature branches)
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Backend | Laravel | 13.7 |
+| Language | PHP | 8.3+ |
+| Database | SQLite (default) / MySQL | — |
+| ORM | Eloquent | — |
+| Templating | Blade | — |
+| Frontend CSS | Bootstrap 5 (CDN) | 5.3.3 |
+| Map | Leaflet.js (CDN) | 1.9.4 |
+| Icons | Bootstrap Icons (CDN) | 1.11.3 |
+| Build tool | Vite | 8.x |
+| CSS framework | Tailwind CSS | 4.x |
+| Package (PHP) | Composer | 2.9+ |
+| Package (JS) | npm | 11+ |
+
+---
+
+## Design System
+
+Custom-designed UI prototypes merged into Blade views:
+
+- **Color palette:** Navy (`#0B4F6C`), accent orange (`#E07A5F`), teal (`#2A9D8F`), warm cream background (`#F4F1EA`)
+- **Atmospheric background:** Radial glow + 3-layer SVG skyline pattern
+- **Transparent navbar:** Blur backdrop, becomes solid on scroll, orange underline animation
+- **Hero section:** Gradient card with animated stat counter numbers
+- **Category filter chips:** Clickable pill buttons (Road, Lighting, Waste, Other)
+- **Status radio filters:** Color-coded Open/In Progress/Resolved
+- **Issue cards:** Hover lift effect with accent left border
+- **Scroll reveal:** Fade-in animation via IntersectionObserver
+- **Footer:** SVG wave divider, mountain skyline, link columns, back-to-top button
+- **Form animations:** Shake on validation errors, drag-and-drop file upload with preview
+- **Reduced motion:** `prefers-reduced-motion` respected
+
+---
 
 ## Features
 
-- **Public Map** — issues displayed on an interactive Leaflet map loaded asynchronously via `/api/issues/map`
-- **Report Issues** — form with coordinate picker, image upload, and full validation
-- **Issue Detail** — full description, status history timeline, and threaded comments
-- **Admin Dashboard** — stat cards, category breakdown, and recent issues table
-- **Admin CRUD** — edit issues, change status (with history logging), delete issues (with image cleanup)
-- **Comment Moderation** — admins can delete individual comments
-- **Login Throttling** — admin login limited to 5 attempts per minute
-- **Responsive Design** — works at 320px, 768px, 1024px, and 1440px viewports
+### Public
+
+- **Interactive Map** — Leaflet with async markers via `/api/issues/map`
+- **Issue Cards** — Paginated grid with badges, description, geo-location
+- **Filtering** — Client-side search, category chips, status radios
+- **Report Form** — Title, description, category chips, coordinate picker map, drag-and-drop image upload, anonymous option
+- **Issue Detail** — Full description, photo, mini map, status history timeline, threaded comments with avatar initials
+- **Comment Form** — Shake validation, server-side validation
+
+### Admin (`/admin/login` — admin / admin123)
+
+- **Dashboard** — Stat cards, category breakdown, recent issues
+- **Issue CRUD** — Edit, delete, status change with history logging
+- **Comment Moderation** — Delete individual comments
+- **Login Throttling** — 5 attempts/minute
+- **Image Cleanup** — Removed on issue deletion
+
+---
 
 ## Installation
 
 ```bash
-# 1. Clone the repository
-git clone <repo-url>
+# 1. Clone
+git clone --branch UI-prototypes https://github.com/peter-pheak/community-issue-tracker.git
 cd community-issue-tracker
 
-# 2. Install dependencies
+# 2. PHP dependencies
 composer install
 
-# 3. Configure environment
+# 3. Environment
 cp .env.example .env
 php artisan key:generate
 
-# 4. The project uses SQLite by default (no MySQL setup needed).
-#    Database file: database/database.sqlite
+# 4. Database (SQLite)
+touch database/database.sqlite
+php artisan migrate --seed
 
-# 5. If PHP SQLite extension is missing, install it:
-#    Ubuntu/Debian: sudo apt install php8.3-sqlite3
-#    macOS:          brew install php (includes SQLite)
-#    Or use the included helper that loads the extension:
-#    Run all artisan commands via: ./artisan.sh <command>
+# 5. Storage symlink
+php artisan storage:link
 
-# 6. Run migrations and seed
-./artisan.sh migrate --seed
+# 6. Frontend
+npm install
+npm run build
 
-# 7. Create storage symlink (required for image uploads)
-./artisan.sh storage:link
-
-# 8. Start the development server
-./artisan.sh serve
+# 7. Run
+php artisan serve
 ```
 
-## Admin Credentials (demo)
+Open **http://localhost:8000**
 
-```
-URL:      http://localhost:8000/admin/login
-Username: admin
-Password: admin123
-```
+### Install PHP (Ubuntu)
 
-## Directory Structure (key files)
-
-```
-app/
-├── Http/
-│   ├── Controllers/
-│   │   ├── Admin/
-│   │   │   ├── CommentController.php    # M5 — admin comment moderation
-│   │   │   ├── DashboardController.php  # M5 — admin dashboard stats
-│   │   │   └── IssueController.php      # M5 — admin issue CRUD
-│   │   ├── CommentController.php        # M4 — public comment posting
-│   │   ├── IssueController.php          # M3 + M4 — index, mapData, show
-│   │   ├── LoginController.php          # M1 — admin auth
-│   │   └── ReportController.php         # M2 — issue reporting
-│   └── Requests/
-│       └── IssueRequest.php             # M2 — form validation
-├── Models/
-│   ├── Admin.php
-│   ├── Comment.php
-│   ├── Issue.php
-│   └── StatusHistory.php
-database/
-├── migrations/
-│   ├── ..._create_admins_table.php
-│   ├── ..._create_issues_table.php       # DECIMAL(10,8) / DECIMAL(11,8)
-│   ├── ..._create_status_history_table.php
-│   └── ..._create_comments_table.php
-└── seeders/
-    └── AdminSeeder.php
-resources/views/
-├── layouts/
-│   └── app.blade.php                    # M6 — master layout
-├── home.blade.php                       # M3 — map + card list
-├── issues/
-│   ├── report.blade.php                 # M2 — report form
-│   └── show.blade.php                   # M4 — issue detail
-└── admin/
-    ├── login.blade.php                  # M6 — admin login page
-    ├── dashboard.blade.php              # M5 — admin dashboard
-    └── issues/
-        ├── index.blade.php              # M5 — manage issues table
-        └── edit.blade.php               # M5 — edit issue form
-routes/
-└── web.php                              # M1 — route definitions
+```bash
+apt search php | grep "^php[0-9]"   # Find your version
+sudo apt install -y php8.5-cli php8.5-mbstring php8.5-xml \
+  php8.5-curl php8.5-gd php8.5-tokenizer php8.5-fileinfo php8.5-sqlite3
 ```
 
-## Submission Checklist
+### Install Composer
 
-- [x] GitHub repository with clean commit history
-- [x] README.md with project overview, team, tech stack, install steps
-- [x] `php artisan storage:link` documented
-- [x] Admin login with throttle middleware
-- [x] Map loads asynchronously via `/api/issues/map`
-- [x] `latitude` / `longitude` columns are DECIMAL, not FLOAT
-- [x] Composite index on `['status', 'category']`
-- [x] CSRF token on every form (`@csrf`)
-- [x] Image file cleanup on issue deletion
-- [x] Responsive at 320px, 768px, 1024px, 1440px
-- [x] Input validation on every form (Form Request + HTML5)
+```bash
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php && php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/local/bin/composer
+```
+
+---
+
+## Seed Sample Data
+
+```bash
+php artisan tinker
+# Then paste:
+collect([
+    ["title"=>"Pothole on Main Street","description"=>"Large pothole near Main St and Oak Ave.","category"=>"Road","status"=>"Open","latitude"=>11.565,"longitude"=>104.915,"address"=>"Main St & Oak Ave","reported_by"=>"Jane D."],
+    ["title"=>"Street Light Out on Elm","description"=>"Street light at Elm and Pine has been out for two weeks.","category"=>"Lighting","status"=>"In Progress","latitude"=>11.558,"longitude"=>104.888,"address"=>"Elm St & Pine Ave","reported_by"=>"Mike K."],
+    ["title"=>"Illegal Dumping at Park","description"=>"Construction debris dumped in the park overnight.","category"=>"Waste","status"=>"Resolved","latitude"=>11.572,"longitude"=>104.905,"address"=>"Central Park","reported_by"=>"Sarah L."],
+    ["title"=>"Broken Bench in Central Park","description"=>"Bench near the fountain has a broken leg.","category"=>"Other","status"=>"Open","latitude"=>11.571,"longitude"=>104.904,"address"=>"Central Park Fountain","reported_by"=>"Tom R."],
+    ["title"=>"Faded Crosswalk Lines","description"=>"Crosswalk lines near school are almost invisible.","category"=>"Road","status"=>"In Progress","latitude"=>11.562,"longitude"=>104.925,"address"=>"Near School","reported_by"=>"Lisa M."],
+    ["title"=>"Broken Street Light Fixture","description"=>"Light fixture damaged. Replacement completed.","category"=>"Lighting","status"=>"Resolved","latitude"=>11.555,"longitude"=>104.895,"address"=>"Oak Ave","reported_by"=>"Admin"],
+])->each(fn($d)=> \App\Models\Issue::create($d));
+```
+
+---
+
+## Routes
+
+| Method | URI | Name | Purpose |
+|--------|-----|------|---------|
+| GET | `/` | `home` | Homepage with map + cards |
+| GET | `/report` | `report.create` | Report form |
+| POST | `/report` | `report.store` | Submit issue |
+| GET | `/issues/{issue}` | `issues.show` | Issue detail |
+| POST | `/issues/{issue}/comments` | `comments.store` | Post comment |
+| GET | `/api/issues/map` | `api.issues.map` | Map marker JSON |
+| GET | `/admin/login` | `admin.login` | Login page |
+| POST | `/admin/login` | `admin.login.submit` | Login (throttled) |
+| POST | `/admin/logout` | `admin.logout` | Logout |
+| GET | `/admin/dashboard` | `admin.dashboard` | Dashboard |
+| GET | `/admin/issues` | `admin.issues.index` | Issues table |
+| GET | `/admin/issues/{issue}/edit` | `admin.issues.edit` | Edit form |
+| PUT | `/admin/issues/{issue}` | `admin.issues.update` | Save edit |
+| DELETE | `/admin/issues/{issue}` | `admin.issues.destroy` | Delete issue |
+| DELETE | `/admin/comments/{comment}` | `admin.comments.destroy` | Delete comment |
+
+---
+
+## Common Tasks
+
+```bash
+php artisan serve                         # Dev server
+php artisan migrate:fresh --seed          # Reset database
+php artisan optimize:clear                # Clear cache
+npm run build                             # Rebuild frontend
+npm run dev                               # Hot reload (Vite)
+```
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| Form not visible | Add `visible` class alongside `reveal` |
+| Stat counters show 0 | Ensure `$stats` is passed in `IssueController@index` |
+| Route [issues.map] not defined | Change `route('issues.map')` to `route('home')` in layout |
+| PHP package not found | `apt search php` to find correct version |
+| HTTP 500 | `tail -50 storage/logs/laravel.log` |
+| SQLite driver missing | `sudo apt install -y php8.5-sqlite3` |
+| Vite build fails | `rm -rf node_modules && npm install && npm run build` |
+
+---
+
+## Directory Structure
+
+```
+app/Http/Controllers/       # IssueController, ReportController, CommentController, LoginController
+app/Http/Controllers/Admin/ # DashboardController, IssueController, CommentController
+app/Models/                 # Issue, Comment, Admin, StatusHistory
+database/migrations/        # 7 table schemas
+resources/views/layouts/    # app.blade.php (master layout)
+resources/views/            # home.blade.php
+resources/views/issues/     # report.blade.php, show.blade.php
+resources/views/admin/      # login.blade.php, dashboard.blade.php
+resources/views/admin/issues/ # index.blade.php, edit.blade.php
+routes/web.php              # All route definitions
+ui-prototypes/              # Static HTML design prototypes
+```
+
+---
 
 ## License
 
-This project is created for educational purposes.
+Educational purposes.
